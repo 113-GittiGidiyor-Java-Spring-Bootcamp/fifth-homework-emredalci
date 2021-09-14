@@ -2,6 +2,9 @@ package dev.patika.fifthhomeworkemredalci.service;
 
 import dev.patika.fifthhomeworkemredalci.dto.CourseRequestDTO;
 import dev.patika.fifthhomeworkemredalci.dto.CourseResponseDTO;
+import dev.patika.fifthhomeworkemredalci.exception.CourseIsAlreadyExistException;
+import dev.patika.fifthhomeworkemredalci.exception.EntityNotFoundException;
+import dev.patika.fifthhomeworkemredalci.exception.StudentNumberForOneCourseExceedException;
 import dev.patika.fifthhomeworkemredalci.mapper.CourseMapper;
 import dev.patika.fifthhomeworkemredalci.model.Course;
 import dev.patika.fifthhomeworkemredalci.repository.CourseRepository;
@@ -89,9 +92,7 @@ class CourseServiceTest {
         );
     }
 
-    @Test
-    void deleteById() {
-    }
+
 
     @Test
     void update() {
@@ -108,5 +109,29 @@ class CourseServiceTest {
         assertAll(
                 () -> assertNotNull(actual)
         );
+    }
+
+    @Test
+    void should_ThrowEntityNotFoundException_WhenEntityDoesntExist(){
+        assertThrows(EntityNotFoundException.class,() -> courseService.findByName(anyString()));
+    }
+
+    @Test
+    void should_ThrowCourseIsAlreadyExistException_WhenCourseCodeIsExist(){
+        when(courseRepository.existsByCourseCode(anyString())).thenReturn(Boolean.TRUE);
+        CourseRequestDTO requestDTO = new CourseRequestDTO();
+        requestDTO.setCourseCode("ABC");
+        assertThrows(CourseIsAlreadyExistException.class,()-> courseService.save(requestDTO));
+    }
+
+    @Test
+    void should_ThrowStudentNumberForOneCourseExceedException_WhenStudentSizeGreaterThanTwenty(){
+        CourseRequestDTO requestDTO = new CourseRequestDTO();
+        Set<Long> ids = new HashSet<>();
+        for (long i =1;i <40;i++){
+            ids.add(i);
+        }
+        requestDTO.setStudentIds(ids);
+        assertThrows(StudentNumberForOneCourseExceedException.class,() -> courseService.save(requestDTO));
     }
 }

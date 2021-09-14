@@ -2,6 +2,9 @@ package dev.patika.fifthhomeworkemredalci.service;
 
 import dev.patika.fifthhomeworkemredalci.dto.StudentRequestDTO;
 import dev.patika.fifthhomeworkemredalci.dto.StudentResponseDTO;
+import dev.patika.fifthhomeworkemredalci.exception.EntityNotFoundException;
+import dev.patika.fifthhomeworkemredalci.exception.StudentAgeNotValidException;
+import dev.patika.fifthhomeworkemredalci.exception.StudentIsAlreadyExistException;
 import dev.patika.fifthhomeworkemredalci.mapper.StudentMapper;
 import dev.patika.fifthhomeworkemredalci.model.Student;
 import dev.patika.fifthhomeworkemredalci.repository.StudentRepository;
@@ -131,8 +134,33 @@ class StudentServiceTest {
     }
 
     @Test
-    void findAllId() {
-
-
+    void should_ThrowStudentAgeNotValidException_WhenStudentAgeIsNotValid(){
+        StudentRequestDTO requestDTO = new StudentRequestDTO();
+        requestDTO.setBirthDate(LocalDate.of(1000,01,01));
+        assertThrows(StudentAgeNotValidException.class,()->studentService.save(requestDTO));
     }
+
+    @Test
+    void should_ThrowStudentIsAlreadyExistException_WhenAlreadyIsExist(){
+        StudentRequestDTO requestDTO = new StudentRequestDTO();
+        requestDTO.setBirthDate(LocalDate.of(2000,01,01));
+        requestDTO.setName("ABC");
+        when(studentRepository.existsByNameAndBirthDate(requestDTO.getName(),requestDTO.getBirthDate())).thenReturn(Boolean.TRUE);
+        assertThrows(StudentIsAlreadyExistException.class,()-> studentService.save(requestDTO));
+    }
+
+    @Test
+    void should_ThrowEntityNotFoundException_WhenEntityDoesntExist(){
+        assertThrows(EntityNotFoundException.class,() -> studentService.deleteById(1L));
+    }
+
+    @Test
+    void should_ThrowEntityNotFoundException_WhenEntityDoesntExist2(){
+        Set<Long> ids =new HashSet<>();
+        ids.add(1L);
+        ids.add(2L);
+        assertThrows(EntityNotFoundException.class,() -> studentService.findAllIds(ids));
+    }
+
+
 }

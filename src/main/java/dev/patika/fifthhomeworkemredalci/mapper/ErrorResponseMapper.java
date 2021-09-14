@@ -10,4 +10,5 @@ public interface ErrorResponseMapper {
 
 
     ErrorResponseDTO mapFromErrorResponsetoErrorResponseDTO(ErrorResponse errorResponse);
+    ErrorResponse mapFromErrorResponseDTOtoErrorResponse(ErrorResponseDTO errorResponseDTO);
 }

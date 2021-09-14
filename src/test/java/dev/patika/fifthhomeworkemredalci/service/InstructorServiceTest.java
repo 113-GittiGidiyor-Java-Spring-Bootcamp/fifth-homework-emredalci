@@ -1,11 +1,10 @@
 package dev.patika.fifthhomeworkemredalci.service;
 
 import dev.patika.fifthhomeworkemredalci.dto.*;
+import dev.patika.fifthhomeworkemredalci.exception.EntityNotFoundException;
+import dev.patika.fifthhomeworkemredalci.exception.InstructorIsAlreadyExistException;
 import dev.patika.fifthhomeworkemredalci.mapper.InstructorMapper;
-import dev.patika.fifthhomeworkemredalci.model.Course;
-import dev.patika.fifthhomeworkemredalci.model.Instructor;
-import dev.patika.fifthhomeworkemredalci.model.PermanentInstructor;
-import dev.patika.fifthhomeworkemredalci.model.VisitingResearcher;
+import dev.patika.fifthhomeworkemredalci.model.*;
 import dev.patika.fifthhomeworkemredalci.model.enumeration.UpdateSalaryType;
 import dev.patika.fifthhomeworkemredalci.repository.InstructorRepository;
 import dev.patika.fifthhomeworkemredalci.repository.InstructorSalaryLoggerRepository;
@@ -18,6 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -42,9 +42,13 @@ class InstructorServiceTest {
     @InjectMocks
     InstructorService instructorService;
 
-    @Autowired
+    @Mock
     ClientRequestInfo clientRequestInfo;
 
+    /*
+    @Autowired
+    ClientRequestInfo clientRequestInfo;
+    */
 
     @Test
     void findAll() {
@@ -123,9 +127,7 @@ class InstructorServiceTest {
         );
     }
 
-    @Test
-    void deleteById() {
-    }
+
 
     @Test
     void updatePermanentInstructor() {
@@ -201,9 +203,71 @@ class InstructorServiceTest {
 
     @Test
     void findLoggerById() {
+        //given
+        List<InstructorSalaryLogger> logger = new ArrayList<>();
+        when(instructorSalaryLoggerRepository.findByInstructorId(anyLong())).thenReturn(logger);
+        //when
+        List<InstructorSalaryLogger> actual =instructorService.findLoggerById(1L);
+        //then
+        assertAll(
+                () -> assertEquals(logger,actual)
+        );
     }
 
     @Test
     void findLoggerByDate() {
+        //given
+        List<InstructorSalaryLogger> logger = new ArrayList<>();
+        when(instructorSalaryLoggerRepository.findByCreatedTime(any())).thenReturn(logger);
+        //when
+        List<InstructorSalaryLogger> actual =instructorService.findLoggerByDate(LocalDate.now());
+        //then
+        assertAll(
+                () -> assertEquals(logger,actual)
+        );
     }
+
+    @Test
+    void should_ThrowInstructorIsAlreadyExistException_WhenInstructorIsAlreadyExist(){
+        PermanentInstructorRequestDTO requestDTO = new PermanentInstructorRequestDTO();
+        requestDTO.setName("ABC");
+        requestDTO.setPhoneNumber("11111111111");
+        when(instructorRepository.existsByNameAndPhoneNumber(requestDTO.getName(),requestDTO.getPhoneNumber())).thenReturn(Boolean.TRUE);
+        assertThrows(InstructorIsAlreadyExistException.class,() -> instructorService.savePermentInstructor(requestDTO));
+    }
+
+    @Test
+    void should_ThrowInstructorIsAlreadyExistException_WhenInstructorIsAlreadyExist2(){
+        VisitingResearcherRequestDTO requestDTO = new VisitingResearcherResponseDTO();
+        requestDTO.setName("ABC");
+        requestDTO.setPhoneNumber("11111111111");
+        when(instructorRepository.existsByNameAndPhoneNumber(requestDTO.getName(),requestDTO.getPhoneNumber())).thenReturn(Boolean.TRUE);
+        assertThrows(InstructorIsAlreadyExistException.class,() -> instructorService.saveVisitingResearcher(requestDTO));
+    }
+
+    @Test
+    void should_ThrowEntityNotFoundException_WhenEntityDoesntExist(){
+        PermanentInstructorResponseDTO responseDTO = new PermanentInstructorResponseDTO();
+        responseDTO.setId(1L);
+
+        assertThrows(EntityNotFoundException.class,()-> instructorService.updatePermanentInstructor(responseDTO));
+    }
+
+    @Test
+    void should_ThrowEntityNotFoundException_WhenEntityDoesntExist2(){
+        VisitingResearcherResponseDTO responseDTO = new VisitingResearcherResponseDTO();
+        responseDTO.setId(1L);
+
+        assertThrows(EntityNotFoundException.class,()-> instructorService.updateVisitingResearcher(responseDTO));
+    }
+
+    @Test
+    void should_ThrowEntityNotFoundException_WhenEntityDoesntExist3(){
+
+        assertThrows(EntityNotFoundException.class,()-> instructorService.deleteById(1L));
+    }
+
+
+
+
 }

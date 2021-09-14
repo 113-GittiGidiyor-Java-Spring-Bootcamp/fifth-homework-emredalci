@@ -185,7 +185,13 @@ public class InstructorService implements BaseService<InstructorResponseDTO>{
 
     }
 
-
+    /** Update instructor salary.
+     *
+     * @param id
+     * @param updateSalaryType
+     * @param amount
+     * @return
+     */
     public InstructorRequestDTO updateInstructorSalary(long id, UpdateSalaryType updateSalaryType, double amount) {
         Instructor instructor = instructorRepository.findById(id).get();
         if(instructor.getClass()==PermanentInstructor.class){
@@ -239,10 +245,20 @@ public class InstructorService implements BaseService<InstructorResponseDTO>{
 
     }
 
+    /** Find instructor loggers by instructor id
+     *
+     * @param id
+     * @return
+     */
     public List<InstructorSalaryLogger> findLoggerById(long id){
         return instructorSalaryLoggerRepository.findByInstructorId(id);
     }
 
+    /** Find instructor loggers by date
+     *
+     * @param date
+     * @return
+     */
     public List<InstructorSalaryLogger> findLoggerByDate(LocalDate date){
         return instructorSalaryLoggerRepository.findByCreatedTime(date);
     }

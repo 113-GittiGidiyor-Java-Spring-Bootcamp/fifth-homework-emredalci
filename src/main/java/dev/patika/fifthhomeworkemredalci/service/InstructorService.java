@@ -37,8 +37,8 @@ public class InstructorService implements BaseService<InstructorResponseDTO>{
     private final InstructorMapper instructorMapper;
     private final InstructorSalaryLoggerRepository instructorSalaryLoggerRepository;
 
-    @Autowired
-    private ClientRequestInfo clientRequestInfo;
+
+    private final ClientRequestInfo clientRequestInfo;
 
     /** Represent all InstructorResponseDTOs
      *

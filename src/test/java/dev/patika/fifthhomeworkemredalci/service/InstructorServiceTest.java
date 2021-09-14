@@ -187,7 +187,7 @@ class InstructorServiceTest {
         when(instructorRepository.findById(anyLong())).thenReturn(Optional.of(permanentInstructor));
         when(instructorRepository.save(any())).thenReturn(instructor);
         when(instructorMapper.mapFromPermanentInstructortoPermanentInstructorResponseDTO(any())).thenReturn(permanentInstructorResponseDTO);
-        when(instructorMapper.mapFromVisitingResearchertoVisitingResearcherResponseDTO(any())).thenReturn(visitingResearcherResponseDTO);
+        //when(instructorMapper.mapFromVisitingResearchertoVisitingResearcherResponseDTO(any())).thenReturn(visitingResearcherResponseDTO);
         //when
         Instructor ins = new Instructor();
         ins.setId(1L);
